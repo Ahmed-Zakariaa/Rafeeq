@@ -287,6 +287,25 @@
     "selectRoles": "اختر الأدوار",
     "directPermissions": "صلاحيات مباشرة"
   },
+  "lookups": {
+    "title": "المدن والدول",
+    "subtitle": "إدارة الوجهات المتاحة في التطبيق",
+    "countries": "الدول",
+    "cities": "المدن",
+    "addCountry": "إضافة دولة",
+    "addCity": "إضافة مدينة",
+    "editCountry": "تعديل الدولة",
+    "editCity": "تعديل المدينة",
+    "nameEn": "الاسم (إنجليزي)",
+    "nameAr": "الاسم (عربي)",
+    "iso": "رمز الدولة",
+    "currency": "العملة",
+    "phone": "مفتاح الهاتف",
+    "country": "الدولة",
+    "allCountries": "كل الدول",
+    "active": "مُفعّل",
+    "none": "لا يوجد شيء بعد"
+  },
   "perm": {
     "resource": {
       "Dashboard": "لوحة المعلومات",
@@ -335,7 +354,8 @@
       "admins": "المشرفون",
       "verification": "توثيق المستندات",
       "reports": "البلاغات",
-      "roles": "الأدوار"
+      "roles": "الأدوار",
+      "lookups": "المدن والدول"
     },
     "status": {
       "all": "كل الحالات",

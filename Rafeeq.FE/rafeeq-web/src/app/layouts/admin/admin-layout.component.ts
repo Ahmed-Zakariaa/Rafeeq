@@ -106,6 +106,7 @@ export class AdminLayoutComponent {
       { labelKey: 'admin.nav.verification', icon: 'pi-verified', link: '/admin/verification', permission: 'Verification.Review' },
       { labelKey: 'admin.nav.reports', icon: 'pi-flag', link: '/admin/reports', permission: 'Reports.Handle' },
       { labelKey: 'admin.nav.roles', icon: 'pi-sitemap', link: '/admin/roles', permission: 'Admins.Manage' },
+      { labelKey: 'admin.nav.lookups', icon: 'pi-map-marker', link: '/admin/lookups', permission: 'Lookups.Manage' },
     ] as AdminNavItem[]
   ).filter((i) => this.auth.hasPermission(i.permission));
 

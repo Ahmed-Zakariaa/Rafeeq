@@ -287,6 +287,25 @@
     "selectRoles": "Select roles",
     "directPermissions": "Direct permissions"
   },
+  "lookups": {
+    "title": "Cities & countries",
+    "subtitle": "Manage the destinations available across the app",
+    "countries": "Countries",
+    "cities": "Cities",
+    "addCountry": "Add country",
+    "addCity": "Add city",
+    "editCountry": "Edit country",
+    "editCity": "Edit city",
+    "nameEn": "Name (English)",
+    "nameAr": "Name (Arabic)",
+    "iso": "ISO code",
+    "currency": "Currency",
+    "phone": "Phone prefix",
+    "country": "Country",
+    "allCountries": "All countries",
+    "active": "Active",
+    "none": "Nothing here yet"
+  },
   "perm": {
     "resource": {
       "Dashboard": "Dashboard",
@@ -335,7 +354,8 @@
       "admins": "Admins",
       "verification": "Verification",
       "reports": "Reports",
-      "roles": "Roles"
+      "roles": "Roles",
+      "lookups": "Cities & countries"
     },
     "status": {
       "all": "All statuses",

@@ -112,6 +112,13 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./modules/admin/pages/roles/roles.component').then((m) => m.RolesComponent),
       },
+      {
+        path: 'lookups',
+        canActivate: [permissionGuard],
+        data: { permission: 'Lookups.Manage' },
+        loadComponent: () =>
+          import('./modules/admin/pages/lookups/lookups.component').then((m) => m.LookupsComponent),
+      },
       { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
     ],
   },
