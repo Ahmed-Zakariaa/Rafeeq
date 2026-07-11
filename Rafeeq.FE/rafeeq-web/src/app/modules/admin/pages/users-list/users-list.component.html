@@ -1,0 +1,195 @@
+<div class="flex items-center justify-between mb-5">
+  <h1 class="text-2xl font-extrabold text-ink">{{ titleKey | translate }}</h1>
+  <button
+    *ngIf="isAdminsView && canManageAdmins"
+    pButton
+    type="button"
+    [label]="'admin.createAdmin' | translate"
+    icon="pi pi-plus"
+    (click)="openCreate()"
+  ></button>
+</div>
+
+<!-- Filters -->
+<div class="bg-surface rounded-xl shadow-sm border border-line p-4 mb-4 flex flex-wrap items-end gap-3">
+  <div class="flex flex-col gap-1.5 flex-1 min-w-[200px]">
+    <label class="text-sm font-medium text-ink">{{ 'admin.search' | translate }}</label>
+    <input pInputText [(ngModel)]="search" (keyup.enter)="load()" class="w-full" />
+  </div>
+  <div class="flex flex-col gap-1.5">
+    <label class="text-sm font-medium text-ink">{{ 'admin.statusFilter' | translate }}</label>
+    <p-dropdown
+      [(ngModel)]="statusFilter"
+      [options]="statusOptions"
+      optionLabel="label"
+      optionValue="value"
+    ></p-dropdown>
+  </div>
+  <button pButton type="button" [label]="'admin.search' | translate" icon="pi pi-search" (click)="load()"></button>
+</div>
+
+<!-- Table -->
+<div class="bg-surface rounded-xl shadow-sm border border-line p-2">
+  <p-table [value]="users" [loading]="loading" styleClass="p-datatable-sm">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>{{ 'fields.fullName' | translate }}</th>
+        <th>{{ 'fields.email' | translate }}</th>
+        <th>{{ 'fields.phoneNumber' | translate }}</th>
+        <th>{{ 'admin.roles' | translate }}</th>
+        <th>{{ 'admin.statusFilter' | translate }}</th>
+        <th>{{ 'admin.activated' | translate }}</th>
+        <th class="text-end">{{ 'admin.actions' | translate }}</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-u>
+      <tr>
+        <td class="font-medium text-ink">{{ u.FullName }}</td>
+        <td class="ltr-nums">{{ u.Email }}</td>
+        <td class="ltr-nums">{{ u.PhoneNumber }}</td>
+        <td>
+          <span *ngFor="let r of u.Roles" class="text-xs bg-brand-050 text-brand rounded px-2 py-0.5 me-1">
+            {{ r }}
+          </span>
+        </td>
+        <td>
+          <p-tag [value]="('admin.status.' + u.AccountStatus) | translate" [severity]="statusSeverity(u.AccountStatus)"></p-tag>
+        </td>
+        <td>
+          <i class="pi" [ngClass]="u.IsActivated ? 'pi-check-circle text-success' : 'pi-clock text-warning'"></i>
+        </td>
+        <td>
+          <div class="flex items-center gap-1 justify-end">
+            <button
+              *ngIf="isAdminsView && canManageAdmins"
+              pButton
+              type="button"
+              icon="pi pi-key"
+              [title]="'admin.permissions' | translate"
+              class="p-button-text p-button-sm"
+              (click)="openPerms(u)"
+            ></button>
+
+            <ng-container *ngIf="canManageUsers">
+              <button
+                *ngIf="u.AccountStatus !== 'Active'"
+                pButton
+                type="button"
+                icon="pi pi-check"
+                class="p-button-text p-button-sm p-button-success"
+                [title]="'admin.reactivate' | translate"
+                (click)="setStatus(u, Status.Active)"
+              ></button>
+              <button
+                *ngIf="u.AccountStatus === 'Active'"
+                pButton
+                type="button"
+                icon="pi pi-pause"
+                class="p-button-text p-button-sm p-button-warning"
+                [title]="'admin.suspend' | translate"
+                (click)="setStatus(u, Status.Suspended)"
+              ></button>
+              <button
+                *ngIf="u.AccountStatus !== 'Banned'"
+                pButton
+                type="button"
+                icon="pi pi-ban"
+                class="p-button-text p-button-sm p-button-danger"
+                [title]="'admin.ban' | translate"
+                (click)="setStatus(u, Status.Banned)"
+              ></button>
+            </ng-container>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="7" class="text-center text-muted py-8">{{ 'admin.noUsers' | translate }}</td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <p-paginator
+    *ngIf="total > pageSize"
+    [first]="(pageNumber - 1) * pageSize"
+    [rows]="pageSize"
+    [totalRecords]="total"
+    [rowsPerPageOptions]="[10, 20, 50]"
+    (onPageChange)="onPage($event)"
+  ></p-paginator>
+</div>
+
+<!-- Create admin dialog -->
+<p-dialog
+  [(visible)]="createVisible"
+  [modal]="true"
+  [style]="{ width: '32rem' }"
+  [header]="'admin.createAdmin' | translate"
+  [dismissableMask]="true"
+>
+  <form [formGroup]="createForm" class="flex flex-col gap-4 pt-2">
+    <div class="flex flex-col gap-1.5">
+      <label class="text-sm font-medium text-ink req">{{ 'fields.fullName' | translate }}</label>
+      <input pInputText formControlName="fullName" class="w-full" />
+    </div>
+    <div class="flex flex-col gap-1.5">
+      <label class="text-sm font-medium text-ink req">{{ 'fields.email' | translate }}</label>
+      <input pInputText type="email" formControlName="email" class="w-full ltr-nums" />
+    </div>
+    <div class="grid grid-cols-2 gap-3">
+      <div class="flex flex-col gap-1.5">
+        <label class="text-sm font-medium text-ink req">{{ 'fields.phoneNumber' | translate }}</label>
+        <input pInputText formControlName="phoneNumber" class="w-full ltr-nums" />
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <label class="text-sm font-medium text-ink">{{ 'fields.gender' | translate }}</label>
+        <p-dropdown formControlName="gender" [options]="genderOptions" optionLabel="label" optionValue="value"></p-dropdown>
+      </div>
+    </div>
+    <div class="flex flex-col gap-1.5">
+      <label class="text-sm font-medium text-ink">{{ 'fields.country' | translate }}</label>
+      <p-dropdown formControlName="countryId" [options]="countryOptions" optionLabel="label" optionValue="value"></p-dropdown>
+    </div>
+    <div class="flex flex-col gap-1.5">
+      <label class="text-sm font-medium text-ink">{{ 'admin.permissions' | translate }}</label>
+      <app-permission-matrix [catalog]="catalog" [(selected)]="newAdminPerms"></app-permission-matrix>
+    </div>
+  </form>
+  <ng-template pTemplate="footer">
+    <button pButton type="button" [label]="'common.cancel' | translate" class="p-button-text" (click)="createVisible = false"></button>
+    <button pButton type="button" [label]="'admin.invite' | translate" [loading]="saving" (click)="submitCreate()"></button>
+  </ng-template>
+</p-dialog>
+
+<!-- Permissions dialog -->
+<p-dialog
+  [(visible)]="permsVisible"
+  [modal]="true"
+  [style]="{ width: '30rem' }"
+  [header]="'admin.permissionsFor' | translate: { name: permsTarget?.FullName }"
+  [dismissableMask]="true"
+>
+  <div class="pt-2 flex flex-col gap-4">
+    <div class="flex flex-col gap-1.5">
+      <label class="text-sm font-medium text-ink">{{ 'roles.assignRoles' | translate }}</label>
+      <p-multiSelect
+        [options]="roleOptions"
+        [(ngModel)]="permsRoles"
+        optionLabel="label"
+        optionValue="value"
+        [placeholder]="'roles.selectRoles' | translate"
+        styleClass="w-full"
+        display="chip"
+      ></p-multiSelect>
+    </div>
+    <div class="flex flex-col gap-1.5">
+      <label class="text-sm font-medium text-ink">{{ 'roles.directPermissions' | translate }}</label>
+      <app-permission-matrix [catalog]="catalog" [(selected)]="permsSelected"></app-permission-matrix>
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <button pButton type="button" [label]="'common.cancel' | translate" class="p-button-text" (click)="permsVisible = false"></button>
+    <button pButton type="button" [label]="'common.save' | translate" [loading]="permsSaving" (click)="savePerms()"></button>
+  </ng-template>
+</p-dialog>

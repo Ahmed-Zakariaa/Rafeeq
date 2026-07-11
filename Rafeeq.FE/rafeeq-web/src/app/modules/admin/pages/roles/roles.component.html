@@ -1,0 +1,61 @@
+<div class="flex items-center justify-between mb-5">
+  <div>
+    <h1 class="text-2xl font-extrabold text-ink">{{ 'roles.title' | translate }}</h1>
+    <p class="text-muted">{{ 'roles.subtitle' | translate }}</p>
+  </div>
+  <button pButton type="button" [label]="'roles.new' | translate" icon="pi pi-plus" (click)="openNew()"></button>
+</div>
+
+<div class="bg-surface rounded-xl shadow-sm border border-line p-2">
+  <p-table [value]="roles" [loading]="loading" styleClass="p-datatable-sm">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>{{ 'roles.name' | translate }}</th>
+        <th>{{ 'roles.permissions' | translate }}</th>
+        <th class="text-end">{{ 'admin.actions' | translate }}</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-r>
+      <tr>
+        <td class="font-medium text-ink">{{ r.Name }}</td>
+        <td>
+          <span class="text-xs bg-brand-050 text-brand rounded px-2 py-0.5 ltr-nums">
+            {{ r.Permissions.length }}
+          </span>
+        </td>
+        <td>
+          <div class="flex items-center gap-1 justify-end">
+            <button pButton type="button" icon="pi pi-pencil" class="p-button-text p-button-sm" (click)="openEdit(r)"></button>
+            <button pButton type="button" icon="pi pi-trash" class="p-button-text p-button-sm p-button-danger" (click)="remove(r)"></button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr><td colspan="3" class="text-center text-muted py-8">{{ 'roles.none' | translate }}</td></tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-dialog
+  [(visible)]="dialogVisible"
+  [modal]="true"
+  [style]="{ width: '34rem' }"
+  [header]="(editing ? 'roles.edit' : 'roles.new') | translate"
+  [dismissableMask]="true"
+>
+  <div class="pt-2 flex flex-col gap-4">
+    <div class="flex flex-col gap-1.5">
+      <label class="text-sm font-medium text-ink req">{{ 'roles.name' | translate }}</label>
+      <input pInputText [(ngModel)]="name" class="w-full" />
+    </div>
+    <div class="flex flex-col gap-1.5">
+      <label class="text-sm font-medium text-ink">{{ 'roles.permissions' | translate }}</label>
+      <app-permission-matrix [catalog]="catalog" [(selected)]="selectedPerms"></app-permission-matrix>
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <button pButton type="button" [label]="'common.cancel' | translate" class="p-button-text" (click)="dialogVisible = false"></button>
+    <button pButton type="button" [label]="'common.save' | translate" [loading]="saving" (click)="save()"></button>
+  </ng-template>
+</p-dialog>

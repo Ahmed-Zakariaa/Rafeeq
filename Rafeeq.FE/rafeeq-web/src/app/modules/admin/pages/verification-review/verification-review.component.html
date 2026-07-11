@@ -1,0 +1,81 @@
+<h1 class="text-2xl font-extrabold text-ink mb-1">{{ 'verification.reviewTitle' | translate }}</h1>
+<p class="text-muted mb-5">{{ 'verification.reviewSubtitle' | translate }}</p>
+
+<div class="bg-surface rounded-xl shadow-sm border border-line p-2">
+  <p-table [value]="items" [loading]="loading" styleClass="p-datatable-sm">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>{{ 'fields.fullName' | translate }}</th>
+        <th>{{ 'fields.email' | translate }}</th>
+        <th>{{ 'verification.docTypeLabel' | translate }}</th>
+        <th>{{ 'verification.submitted' | translate }}</th>
+        <th class="text-end">{{ 'admin.actions' | translate }}</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-d>
+      <tr>
+        <td class="font-medium text-ink">{{ d.UserName }}</td>
+        <td class="ltr-nums">{{ d.UserEmail }}</td>
+        <td>{{ 'verification.docType.' + d.DocType | translate }}</td>
+        <td class="ltr-nums">{{ d.CreatedDate | date: 'yyyy-MM-dd HH:mm' }}</td>
+        <td>
+          <div class="flex items-center gap-1 justify-end">
+            <button
+              pButton
+              type="button"
+              icon="pi pi-eye"
+              [label]="'verification.view' | translate"
+              class="p-button-text p-button-sm"
+              (click)="view(d)"
+            ></button>
+            <button
+              pButton
+              type="button"
+              icon="pi pi-check"
+              [label]="'verification.approve' | translate"
+              class="p-button-text p-button-sm p-button-success"
+              (click)="approve(d)"
+            ></button>
+            <button
+              pButton
+              type="button"
+              icon="pi pi-times"
+              [label]="'verification.reject' | translate"
+              class="p-button-text p-button-sm p-button-danger"
+              (click)="openReject(d)"
+            ></button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr><td colspan="5" class="text-center text-muted py-8">{{ 'verification.noPending' | translate }}</td></tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<!-- Reject reason -->
+<p-dialog
+  [(visible)]="rejectVisible"
+  [modal]="true"
+  [style]="{ width: '28rem' }"
+  [header]="'verification.rejectTitle' | translate"
+  [dismissableMask]="true"
+>
+  <div class="pt-2 flex flex-col gap-2">
+    <label class="text-sm font-medium text-ink">{{ 'verification.reason' | translate }}</label>
+    <textarea pInputTextarea [(ngModel)]="rejectReason" rows="3" class="w-full" maxlength="300"></textarea>
+  </div>
+  <ng-template pTemplate="footer">
+    <button pButton type="button" [label]="'common.cancel' | translate" class="p-button-text" (click)="rejectVisible = false"></button>
+    <button
+      pButton
+      type="button"
+      [label]="'verification.reject' | translate"
+      class="p-button-danger"
+      [loading]="acting"
+      [disabled]="!rejectReason.trim()"
+      (click)="submitReject()"
+    ></button>
+  </ng-template>
+</p-dialog>

@@ -1,0 +1,208 @@
+<div class="flex flex-col gap-6">
+  <div>
+    <h1 class="text-2xl font-extrabold text-ink">{{ 'trips.searchTitle' | translate }}</h1>
+    <p class="text-muted">{{ 'trips.searchSubtitle' | translate }}</p>
+  </div>
+
+  <!-- Filters -->
+  <form
+    [formGroup]="form"
+    (ngSubmit)="search()"
+    class="bg-surface rounded-xl shadow-sm border border-line p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+  >
+    <div class="flex flex-col gap-1.5">
+      <label class="text-sm font-medium text-ink">{{ 'trips.origin' | translate }}</label>
+      <p-dropdown
+        formControlName="originCityId"
+        [options]="cityOptions"
+        optionLabel="label"
+        optionValue="value"
+        [showClear]="true"
+        [placeholder]="'trips.anyCity' | translate"
+        styleClass="w-full"
+      ></p-dropdown>
+    </div>
+
+    <div class="flex flex-col gap-1.5">
+      <label class="text-sm font-medium text-ink">{{ 'trips.destination' | translate }}</label>
+      <p-dropdown
+        formControlName="destinationCityId"
+        [options]="cityOptions"
+        optionLabel="label"
+        optionValue="value"
+        [showClear]="true"
+        [placeholder]="'trips.anyCity' | translate"
+        styleClass="w-full"
+      ></p-dropdown>
+    </div>
+
+    <div class="flex flex-col gap-1.5">
+      <label class="text-sm font-medium text-ink">{{ 'trips.date' | translate }}</label>
+      <p-calendar
+        formControlName="departureDate"
+        dateFormat="yy-mm-dd"
+        [showClear]="true"
+        [showIcon]="true"
+        styleClass="w-full"
+        appendTo="body"
+      ></p-calendar>
+    </div>
+
+    <div class="flex flex-col gap-1.5">
+      <label class="text-sm font-medium text-ink">{{ 'fields.gender' | translate }}</label>
+      <p-dropdown
+        formControlName="genderPreference"
+        [options]="genderOptions"
+        optionLabel="label"
+        optionValue="value"
+        [showClear]="true"
+        [placeholder]="'trips.gender.Any' | translate"
+        styleClass="w-full"
+      ></p-dropdown>
+    </div>
+
+    <div class="flex flex-col gap-1.5">
+      <label class="text-sm font-medium text-ink">{{ 'trips.sortBy' | translate }}</label>
+      <div class="flex gap-2">
+        <p-dropdown
+          formControlName="sortField"
+          [options]="sortOptions"
+          optionLabel="label"
+          optionValue="value"
+          styleClass="flex-1"
+        ></p-dropdown>
+        <p-dropdown
+          formControlName="sortType"
+          [options]="[
+            { label: ('trips.asc' | translate), value: 0 },
+            { label: ('trips.desc' | translate), value: 1 }
+          ]"
+          optionLabel="label"
+          optionValue="value"
+        ></p-dropdown>
+      </div>
+    </div>
+
+    <div class="flex items-end justify-between gap-3">
+      <div class="flex items-center gap-2">
+        <p-checkbox formControlName="freeOnly" [binary]="true" inputId="freeOnly"></p-checkbox>
+        <label for="freeOnly" class="text-sm text-ink cursor-pointer">
+          {{ 'trips.freeOnly' | translate }}
+        </label>
+      </div>
+      <button
+        pButton
+        type="submit"
+        [label]="'trips.search' | translate"
+        icon="pi pi-search"
+        [loading]="loading"
+      ></button>
+    </div>
+  </form>
+
+  <!-- Results -->
+  <div class="flex items-center justify-between">
+    <span class="text-sm text-muted" *ngIf="searched">
+      {{ 'trips.resultsCount' | translate: { count: total } }}
+    </span>
+  </div>
+
+  <div *ngIf="results.length; else noResults" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div
+      *ngFor="let trip of results"
+      class="bg-surface rounded-xl shadow-sm border border-line p-5 flex flex-col gap-3"
+    >
+      <div class="flex items-center justify-between">
+        <div class="text-lg font-bold text-ink">
+          {{ trip.OriginCity }} <span class="text-brand">→</span> {{ trip.DestinationCity }}
+        </div>
+        <p-tag
+          [value]="'trips.gender.' + trip.GenderPreference | translate"
+          [severity]="trip.GenderPreference === 'FemaleOnly' ? 'warning' : 'info'"
+        ></p-tag>
+      </div>
+
+      <div class="flex items-center gap-2 text-sm text-muted">
+        <i class="pi pi-calendar"></i>
+        <span class="ltr-nums">{{ trip.DepartureDateTime | date: 'yyyy-MM-dd HH:mm' }}</span>
+      </div>
+
+      <div class="flex items-center gap-2 text-sm text-muted">
+        <i class="pi pi-map-marker"></i>
+        <span>{{ trip.PickupPointText }}</span>
+      </div>
+
+      <div class="flex items-center justify-between mt-1">
+        <div class="flex items-center gap-2 text-sm">
+          <i class="pi pi-users text-muted"></i>
+          <span class="ltr-nums">{{ trip.SeatsAvailable }} / {{ trip.SeatsLimit }}</span>
+          <span class="text-muted">{{ 'trips.seatsAvailable' | translate }}</span>
+        </div>
+        <div class="font-bold text-brand ltr-nums" *ngIf="!trip.IsFree">
+          {{ trip.PricePerSeat }} {{ trip.CurrencyCode }}
+        </div>
+        <div class="font-bold text-success" *ngIf="trip.IsFree">{{ 'trips.free' | translate }}</div>
+      </div>
+
+      <div class="flex items-center justify-between text-xs text-muted border-t border-line pt-3">
+        <span class="flex items-center gap-2"><i class="pi pi-user"></i>{{ trip.DriverName }}</span>
+        <span *ngIf="trip.DriverRatingCount > 0" class="flex items-center gap-1 text-accent ltr-nums">
+          <i class="pi pi-star-fill"></i>{{ trip.DriverRating }} ({{ trip.DriverRatingCount }})
+        </span>
+      </div>
+
+      <span *ngIf="trip.IsMine" class="text-xs text-muted text-center py-1.5">
+        {{ 'bookings.ownTrip' | translate }}
+      </span>
+      <button
+        *ngIf="canRequest && !trip.IsMine"
+        pButton
+        type="button"
+        [label]="'bookings.requestSeat' | translate"
+        icon="pi pi-ticket"
+        class="p-button-sm w-full"
+        [disabled]="trip.SeatsAvailable <= 0"
+        (click)="openRequest(trip)"
+      ></button>
+    </div>
+  </div>
+
+  <ng-template #noResults>
+    <div *ngIf="searched && !loading" class="text-center text-muted py-12">
+      <i class="pi pi-inbox text-4xl mb-3 block"></i>
+      {{ 'trips.noResults' | translate }}
+    </div>
+  </ng-template>
+
+  <p-paginator
+    *ngIf="total > pageSize"
+    [first]="(pageNumber - 1) * pageSize"
+    [rows]="pageSize"
+    [totalRecords]="total"
+    [rowsPerPageOptions]="[10, 20, 50]"
+    (onPageChange)="onPage($event)"
+  ></p-paginator>
+
+  <!-- Request seat -->
+  <p-dialog
+    [(visible)]="requestVisible"
+    [modal]="true"
+    [style]="{ width: '28rem' }"
+    [header]="'bookings.requestSeat' | translate"
+    [dismissableMask]="true"
+  >
+    <div class="pt-2 flex flex-col gap-3" *ngIf="requestTarget">
+      <div class="text-ink font-medium">
+        {{ requestTarget.OriginCity }} <span class="text-brand">→</span> {{ requestTarget.DestinationCity }}
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <label class="text-sm font-medium text-ink">{{ 'bookings.pickupNote' | translate }}</label>
+        <textarea pInputTextarea [(ngModel)]="pickupNote" rows="2" class="w-full" maxlength="200"></textarea>
+      </div>
+    </div>
+    <ng-template pTemplate="footer">
+      <button pButton type="button" [label]="'common.cancel' | translate" class="p-button-text" (click)="requestVisible = false"></button>
+      <button pButton type="button" [label]="'bookings.sendRequest' | translate" [loading]="requesting" (click)="submitRequest()"></button>
+    </ng-template>
+  </p-dialog>
+</div>

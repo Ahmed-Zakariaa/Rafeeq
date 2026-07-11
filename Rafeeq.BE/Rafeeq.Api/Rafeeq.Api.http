@@ -1,0 +1,6 @@
+@Rafeeq.Api_HostAddress = http://localhost:5113
+
+GET {{Rafeeq.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

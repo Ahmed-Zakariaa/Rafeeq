@@ -1,0 +1,22 @@
+{
+  "folders": [
+    {
+      "name": "Rafeeq · docs & root",
+      "path": "."
+    },
+    {
+      "name": "Backend",
+      "path": "Rafeeq.BE"
+    },
+    {
+      "name": "Frontend",
+      "path": "Rafeeq.FE"
+    }
+  ],
+  "settings": {
+    "files.exclude": {
+      "Rafeeq.BE": true,
+      "Rafeeq.FE": true
+    }
+  }
+}

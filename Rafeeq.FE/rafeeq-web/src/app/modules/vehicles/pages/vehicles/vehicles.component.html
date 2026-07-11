@@ -1,0 +1,78 @@
+<div class="flex flex-col gap-6 max-w-3xl">
+  <div>
+    <h1 class="text-2xl font-extrabold text-ink">{{ 'vehicles.title' | translate }}</h1>
+    <p class="text-muted">{{ 'vehicles.subtitle' | translate }}</p>
+  </div>
+
+  <!-- Add vehicle -->
+  <div class="bg-surface rounded-xl shadow-sm border border-line p-6">
+    <h2 class="text-lg font-bold text-ink mb-4">{{ 'vehicles.add' | translate }}</h2>
+    <form [formGroup]="form" (ngSubmit)="submit()" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div class="flex flex-col gap-1.5">
+        <label class="text-sm font-medium text-ink req">{{ 'vehicles.make' | translate }}</label>
+        <input pInputText formControlName="make" class="w-full" />
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <label class="text-sm font-medium text-ink req">{{ 'vehicles.model' | translate }}</label>
+        <input pInputText formControlName="model" class="w-full" />
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <label class="text-sm font-medium text-ink req">{{ 'vehicles.color' | translate }}</label>
+        <input pInputText formControlName="color" class="w-full" />
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <label class="text-sm font-medium text-ink req">{{ 'vehicles.plate' | translate }}</label>
+        <input pInputText formControlName="plateNumber" class="w-full ltr-nums" />
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <label class="text-sm font-medium text-ink req">{{ 'vehicles.seats' | translate }}</label>
+        <p-inputNumber
+          formControlName="seatsCapacity"
+          [min]="1"
+          [max]="8"
+          [showButtons]="true"
+          styleClass="w-full"
+        ></p-inputNumber>
+      </div>
+      <div class="flex items-end">
+        <button
+          pButton
+          type="submit"
+          [label]="'vehicles.save' | translate"
+          [loading]="saving"
+          class="w-full sm:w-auto"
+        ></button>
+      </div>
+    </form>
+  </div>
+
+  <!-- My vehicles -->
+  <div class="bg-surface rounded-xl shadow-sm border border-line p-6">
+    <h2 class="text-lg font-bold text-ink mb-4">{{ 'vehicles.mine' | translate }}</h2>
+    <p-table [value]="vehicles" [loading]="loadingList" styleClass="p-datatable-sm">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>{{ 'vehicles.make' | translate }}</th>
+          <th>{{ 'vehicles.model' | translate }}</th>
+          <th>{{ 'vehicles.color' | translate }}</th>
+          <th>{{ 'vehicles.plate' | translate }}</th>
+          <th>{{ 'vehicles.seats' | translate }}</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-v>
+        <tr>
+          <td>{{ v.Make }}</td>
+          <td>{{ v.Model }}</td>
+          <td>{{ v.Color }}</td>
+          <td class="ltr-nums">{{ v.PlateNumber }}</td>
+          <td class="ltr-nums">{{ v.SeatsCapacity }}</td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="5" class="text-center text-muted py-6">{{ 'vehicles.none' | translate }}</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>

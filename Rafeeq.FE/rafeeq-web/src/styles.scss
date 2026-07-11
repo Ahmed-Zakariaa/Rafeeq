@@ -1,0 +1,124 @@
+/* ── Rafeeq global styles ───────────────────────────────────────────────
+   PrimeNG theme + core + icons are loaded via angular.json. Here we own
+   Tailwind + the Rafeeq brand tokens (docs/brand-identity.md).          */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --brand: #117C6F;
+  --brand-600: #0E6A5E;
+  --brand-300: #1FA796;
+  --brand-050: #E6F4F1;
+  --accent: #F4A62A;
+  --ink: #1C2B33;
+  --muted: #6B7C84;
+  --bg: #F6F8F8;
+  --surface: #FFFFFF;
+  --border: #E2E8E9;
+  --success: #2BB673;
+  --warning: #F4A62A;
+  --error: #E5484D;
+  --info: #2D8CF0;
+  --female: #9B6DD6;
+
+  /* Steer PrimeNG primary toward the Rafeeq brand teal */
+  --primary-color: #117C6F;
+  --primary-color-text: #ffffff;
+}
+
+/* Tailwind preflight is disabled (so it can't strip PrimeNG styles); add
+   the few resets we actually rely on. */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+h1, h2, h3, h4, p {
+  margin: 0;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  font-family: 'Cairo', system-ui, 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+}
+
+/* Keep numbers/emails/phones LTR even in RTL layout (brand-identity.md). */
+.ltr-nums {
+  direction: ltr;
+  unicode-bidi: plaintext;
+}
+
+/* Required-field marker: add class "req" to a label. */
+.req::after {
+  content: ' *';
+  color: var(--error);
+  font-weight: 700;
+}
+
+/* Horizontal scroll without a visible scrollbar (nav overflow). */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── RTL fixes for PrimeNG (lara theme's RTL is imperfect) ─────────────── */
+[dir='rtl'] {
+  /* Button icon spacing flips to the correct side */
+  .p-button-icon-left {
+    margin-right: 0;
+    margin-left: 0.5rem;
+  }
+  .p-button-icon-right {
+    margin-left: 0;
+    margin-right: 0.5rem;
+  }
+
+  /* Calendar with trigger button: input keeps right corners, button keeps left corners */
+  .p-calendar .p-inputtext {
+    border-radius: 0;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+  }
+  .p-calendar .p-datepicker-trigger {
+    border-radius: 0;
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+  }
+
+  /* Input group: leading addon (e.g. phone prefix) sits on the right */
+  .p-inputgroup > .p-inputgroup-addon:first-child {
+    border-radius: 0;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+  }
+  .p-inputgroup > .p-inputtext:last-child {
+    border-radius: 0;
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+  }
+
+  /* Number input with stacked +/- buttons: input keeps right corners, buttons sit flush on the left */
+  .p-inputnumber-buttons-stacked .p-inputnumber-input {
+    border-radius: 0 !important;
+    border-top-right-radius: 6px !important;
+    border-bottom-right-radius: 6px !important;
+  }
+  .p-inputnumber-buttons-stacked .p-inputnumber-button-up {
+    border-radius: 0 !important;
+    border-top-left-radius: 6px !important;
+  }
+  .p-inputnumber-buttons-stacked .p-inputnumber-button-down {
+    border-radius: 0 !important;
+    border-bottom-left-radius: 6px !important;
+  }
+}

@@ -1,0 +1,80 @@
+<div class="max-w-3xl flex flex-col gap-6">
+  <div>
+    <h1 class="text-2xl font-extrabold text-ink">{{ 'verification.title' | translate }}</h1>
+    <p class="text-muted">{{ 'verification.subtitle' | translate }}</p>
+  </div>
+
+  <!-- Upload -->
+  <div class="bg-surface rounded-xl shadow-sm border border-line p-6 flex flex-col gap-4">
+    <h2 class="text-lg font-bold text-ink">{{ 'verification.upload' | translate }}</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div class="flex flex-col gap-1.5">
+        <label class="text-sm font-medium text-ink req">{{ 'verification.docTypeLabel' | translate }}</label>
+        <p-dropdown
+          [(ngModel)]="docType"
+          [options]="docTypeOptions"
+          optionLabel="label"
+          optionValue="value"
+          styleClass="w-full"
+        ></p-dropdown>
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <label class="text-sm font-medium text-ink req">{{ 'verification.file' | translate }}</label>
+        <input
+          type="file"
+          accept=".jpg,.jpeg,.png,.pdf"
+          (change)="onFile($event)"
+          class="text-sm text-ink file:me-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-brand-050 file:text-brand file:font-medium"
+        />
+      </div>
+    </div>
+    <p class="text-xs text-muted">{{ 'verification.hint' | translate }}</p>
+    <div>
+      <button
+        pButton
+        type="button"
+        [label]="'verification.uploadBtn' | translate"
+        icon="pi pi-upload"
+        [loading]="uploading"
+        [disabled]="!file"
+        (click)="upload()"
+      ></button>
+    </div>
+  </div>
+
+  <!-- My documents -->
+  <div class="bg-surface rounded-xl shadow-sm border border-line p-2">
+    <p-table [value]="docs" [loading]="loading" styleClass="p-datatable-sm">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>{{ 'verification.docTypeLabel' | translate }}</th>
+          <th>{{ 'verification.fileName' | translate }}</th>
+          <th>{{ 'admin.statusFilter' | translate }}</th>
+          <th>{{ 'verification.reason' | translate }}</th>
+          <th class="text-end">{{ 'admin.actions' | translate }}</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-d>
+        <tr>
+          <td>{{ 'verification.docType.' + d.DocType | translate }}</td>
+          <td class="ltr-nums">{{ d.FileName }}</td>
+          <td><p-tag [value]="'verification.status.' + d.Status | translate" [severity]="sev(d.Status)"></p-tag></td>
+          <td class="text-error text-sm">{{ d.RejectionReason }}</td>
+          <td class="text-end">
+            <button
+              pButton
+              type="button"
+              icon="pi pi-eye"
+              [label]="'verification.view' | translate"
+              class="p-button-text p-button-sm"
+              (click)="view(d)"
+            ></button>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr><td colspan="5" class="text-center text-muted py-6">{{ 'verification.none' | translate }}</td></tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>

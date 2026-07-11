@@ -1,0 +1,157 @@
+<div class="max-w-3xl flex flex-col gap-6">
+  <div>
+    <h1 class="text-2xl font-extrabold text-ink">{{ 'trips.createTitle' | translate }}</h1>
+    <p class="text-muted">{{ 'trips.createSubtitle' | translate }}</p>
+  </div>
+
+  <!-- No vehicle yet -->
+  <div
+    *ngIf="!loadingVehicles && !hasVehicles"
+    class="bg-warning/10 border border-warning/40 rounded-xl p-5 flex items-center justify-between gap-4"
+  >
+    <div class="text-sm text-ink">{{ 'trips.needVehicle' | translate }}</div>
+    <button
+      pButton
+      type="button"
+      [label]="'nav.vehicles' | translate"
+      icon="pi pi-car"
+      class="p-button-sm"
+      routerLink="/vehicles"
+    ></button>
+  </div>
+
+  <form
+    *ngIf="hasVehicles"
+    [formGroup]="form"
+    (ngSubmit)="submit()"
+    class="bg-surface rounded-xl shadow-sm border border-line p-6 grid grid-cols-1 sm:grid-cols-2 gap-4"
+  >
+    <!-- Vehicle -->
+    <div class="flex flex-col gap-1.5 sm:col-span-2">
+      <label class="text-sm font-medium text-ink req">{{ 'trips.vehicle' | translate }}</label>
+      <p-dropdown
+        formControlName="vehicleId"
+        [options]="vehicleOptions"
+        optionLabel="label"
+        optionValue="value"
+        [placeholder]="'trips.selectVehicle' | translate"
+        styleClass="w-full"
+      ></p-dropdown>
+    </div>
+
+    <!-- Origin / Destination -->
+    <div class="flex flex-col gap-1.5">
+      <label class="text-sm font-medium text-ink req">{{ 'trips.origin' | translate }}</label>
+      <p-dropdown
+        formControlName="originCityId"
+        [options]="cityOptions"
+        optionLabel="label"
+        optionValue="value"
+        [placeholder]="'trips.selectCity' | translate"
+        styleClass="w-full"
+      ></p-dropdown>
+    </div>
+    <div class="flex flex-col gap-1.5">
+      <label class="text-sm font-medium text-ink req">{{ 'trips.destination' | translate }}</label>
+      <p-dropdown
+        formControlName="destinationCityId"
+        [options]="cityOptions"
+        optionLabel="label"
+        optionValue="value"
+        [placeholder]="'trips.selectCity' | translate"
+        styleClass="w-full"
+      ></p-dropdown>
+    </div>
+
+    <!-- Departure -->
+    <div class="flex flex-col gap-1.5">
+      <label class="text-sm font-medium text-ink req">{{ 'trips.departure' | translate }}</label>
+      <p-calendar
+        formControlName="departureDateTime"
+        [showTime]="true"
+        hourFormat="24"
+        dateFormat="yy-mm-dd"
+        [minDate]="minDate"
+        [showIcon]="true"
+        styleClass="w-full"
+        appendTo="body"
+      ></p-calendar>
+    </div>
+
+    <!-- Seats -->
+    <div class="flex flex-col gap-1.5">
+      <label class="text-sm font-medium text-ink req">{{ 'trips.seatsLimit' | translate }}</label>
+      <p-inputNumber
+        formControlName="seatsLimit"
+        [min]="1"
+        [max]="8"
+        [showButtons]="true"
+        styleClass="w-full"
+      ></p-inputNumber>
+      <small class="text-muted ltr-nums" *ngIf="selectedVehicleSeats">
+        {{ 'trips.vehicleCapacity' | translate }}: {{ selectedVehicleSeats }}
+      </small>
+    </div>
+
+    <!-- Gender preference -->
+    <div class="flex flex-col gap-1.5">
+      <label class="text-sm font-medium text-ink">{{ 'fields.gender' | translate }}</label>
+      <p-dropdown
+        formControlName="genderPreference"
+        [options]="genderOptions"
+        optionLabel="label"
+        optionValue="value"
+        styleClass="w-full"
+      ></p-dropdown>
+    </div>
+
+    <!-- Free toggle + price -->
+    <div class="flex items-center gap-2 sm:col-span-2">
+      <p-checkbox formControlName="isFree" [binary]="true" inputId="isFree"></p-checkbox>
+      <label for="isFree" class="text-sm text-ink cursor-pointer">{{ 'trips.isFree' | translate }}</label>
+    </div>
+
+    <div class="flex flex-col gap-1.5 sm:col-span-2" *ngIf="!form.controls.isFree.value">
+      <label class="text-sm font-medium text-ink">{{ 'trips.pricePerSeat' | translate }}</label>
+      <p-inputNumber
+        formControlName="pricePerSeat"
+        [min]="0"
+        [max]="maxPrice"
+        mode="decimal"
+        styleClass="w-full"
+      ></p-inputNumber>
+      <small class="text-muted ltr-nums">{{ 'trips.priceCapHint' | translate: { max: maxPrice } }}</small>
+      <small
+        class="text-error"
+        *ngIf="form.controls.pricePerSeat.touched && form.controls.pricePerSeat.invalid"
+      >
+        {{ 'trips.priceInvalid' | translate: { max: maxPrice } }}
+      </small>
+    </div>
+
+    <!-- Pickup point -->
+    <div class="flex flex-col gap-1.5 sm:col-span-2">
+      <label class="text-sm font-medium text-ink req">{{ 'trips.pickup' | translate }}</label>
+      <input pInputText formControlName="pickupPointText" class="w-full" maxlength="200" />
+      <small class="text-error" *ngIf="form.controls.pickupPointText.touched && form.controls.pickupPointText.invalid">
+        {{ 'validation.required' | translate }}
+      </small>
+    </div>
+
+    <!-- Notes -->
+    <div class="flex flex-col gap-1.5 sm:col-span-2">
+      <label class="text-sm font-medium text-ink">{{ 'trips.notes' | translate }}</label>
+      <textarea pInputTextarea formControlName="notes" rows="2" class="w-full"></textarea>
+    </div>
+
+    <div class="sm:col-span-2">
+      <button
+        pButton
+        type="submit"
+        [label]="'trips.post' | translate"
+        icon="pi pi-send"
+        [loading]="saving"
+      ></button>
+    </div>
+  </form>
+</div>

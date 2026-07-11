@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/Rafeeq.BE/">
+    <Project Path="Rafeeq.BE/Rafeeq.Api/Rafeeq.Api.csproj" />
+    <Project Path="Rafeeq.BE/Rafeeq.Application/Rafeeq.Application.csproj" />
+    <Project Path="Rafeeq.BE/Rafeeq.Domain/Rafeeq.Domain.csproj" />
+    <Project Path="Rafeeq.BE/Rafeeq.Infrastructure/Rafeeq.Infrastructure.csproj" />
+  </Folder>
+</Solution>

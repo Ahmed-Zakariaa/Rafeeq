@@ -1,0 +1,40 @@
+# ── .NET ───────────────────────────────────────────────
+**/bin/
+**/obj/
+**/out-tsc/
+*.user
+*.suo
+.vs/
+[Rr]elease/
+[Dd]ebug/
+
+# Runtime-generated uploads (verification documents)
+**/uploads/
+
+# ── Angular / Node ─────────────────────────────────────
+**/node_modules/
+**/dist/
+**/.angular/
+**/coverage/
+npm-debug.log*
+yarn-error.log*
+
+# ── Logs ───────────────────────────────────────────────
+logs/
+*.log
+
+# ── Local / secret config (real secrets live in user-secrets or host env) ──
+appsettings.*.local.json
+*.local.json
+
+# ── OS / editor ────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.swp
+
+# ── Leftover scratch ───────────────────────────────────
+_fe_staged_tmp/
+
+# ── Internal planning / decision docs (kept locally, never public) ──
+docs/
+Rafeeq.FE/README.md

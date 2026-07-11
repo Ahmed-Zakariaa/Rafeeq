@@ -1,0 +1,96 @@
+<div class="bg-surface rounded-xl shadow-sm border border-line p-7">
+  <h2 class="text-2xl font-extrabold text-ink mb-1">{{ 'auth.registerTitle' | translate }}</h2>
+  <p class="text-muted mb-6">{{ 'auth.registerSubtitle' | translate }}</p>
+
+  <form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-col gap-4">
+    <!-- Full name -->
+    <div class="flex flex-col gap-1.5">
+      <label class="text-sm font-medium text-ink req">{{ 'fields.fullName' | translate }}</label>
+      <input pInputText formControlName="fullName" class="w-full" autocomplete="name" />
+      <small class="text-error" *ngIf="form.controls.fullName.touched && form.controls.fullName.invalid">
+        {{ 'validation.required' | translate }}
+      </small>
+    </div>
+
+    <!-- Email -->
+    <div class="flex flex-col gap-1.5">
+      <label class="text-sm font-medium text-ink req">{{ 'fields.email' | translate }}</label>
+      <input pInputText type="email" formControlName="email" class="w-full ltr-nums" autocomplete="email" />
+      <small class="text-error" *ngIf="form.controls.email.touched && form.controls.email.invalid">
+        {{ 'validation.email' | translate }}
+      </small>
+    </div>
+
+    <!-- Phone -->
+    <div class="flex flex-col gap-1.5">
+      <label class="text-sm font-medium text-ink req">{{ 'fields.phoneNumber' | translate }}</label>
+      <div class="p-inputgroup">
+        <span class="p-inputgroup-addon ltr-nums">{{ phonePrefix }}</span>
+        <input pInputText formControlName="phoneNumber" class="w-full ltr-nums" inputmode="tel" />
+      </div>
+      <small class="text-error" *ngIf="form.controls.phoneNumber.touched && form.controls.phoneNumber.invalid">
+        {{ 'validation.required' | translate }}
+      </small>
+    </div>
+
+    <!-- Password -->
+    <div class="flex flex-col gap-1.5">
+      <label class="text-sm font-medium text-ink req">{{ 'fields.password' | translate }}</label>
+      <p-password
+        formControlName="password"
+        [toggleMask]="true"
+        [feedback]="false"
+        styleClass="w-full"
+        inputStyleClass="w-full"
+      ></p-password>
+      <small class="text-error" *ngIf="form.controls.password.touched && form.controls.password.invalid">
+        {{ 'validation.minlength' | translate }}
+      </small>
+    </div>
+
+    <!-- Country + Gender -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div class="flex flex-col gap-1.5">
+        <label class="text-sm font-medium text-ink req">{{ 'fields.country' | translate }}</label>
+        <p-dropdown
+          formControlName="countryId"
+          [options]="countryOptions"
+          optionLabel="label"
+          optionValue="value"
+          styleClass="w-full"
+        ></p-dropdown>
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <label class="text-sm font-medium text-ink req">{{ 'fields.gender' | translate }}</label>
+        <p-selectButton
+          formControlName="gender"
+          [options]="genderOptions"
+          optionLabel="label"
+          optionValue="value"
+          [allowEmpty]="false"
+        ></p-selectButton>
+      </div>
+    </div>
+
+    <!-- As driver -->
+    <div class="flex items-center gap-2">
+      <p-checkbox formControlName="asDriver" [binary]="true" inputId="asDriver"></p-checkbox>
+      <label for="asDriver" class="text-sm text-ink cursor-pointer">
+        {{ 'fields.asDriver' | translate }}
+      </label>
+    </div>
+
+    <button
+      pButton
+      type="submit"
+      [label]="'auth.submitRegister' | translate"
+      [loading]="loading"
+      class="w-full mt-2"
+    ></button>
+  </form>
+
+  <p class="text-center text-sm text-muted mt-5">
+    {{ 'auth.haveAccount' | translate }}
+    <a routerLink="/auth/login" class="text-brand font-semibold">{{ 'nav.login' | translate }}</a>
+  </p>
+</div>
