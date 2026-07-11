@@ -15,6 +15,7 @@ public static class Localizer
         ["invalidCredentials"] = ("بيانات الدخول غير صحيحة", "Invalid email or password"),
         ["accountNotActivated"] = ("الحساب غير مُفعّل بعد، فعّله عبر الرابط المُرسل إلى بريدك", "Account not activated yet — activate it via the email link"),
         ["accountNotActive"] = ("الحساب موقوف أو محظور", "Account is suspended or banned"),
+        ["emailNotVerified"] = ("يجب توثيق بريدك الإلكتروني أولاً", "Please verify your email first"),
         ["emailAlreadyRegistered"] = ("البريد الإلكتروني مسجّل بالفعل", "Email is already registered"),
         ["countryNotFound"] = ("الدولة غير موجودة", "Country not found"),
         ["invalidOrExpiredToken"] = ("الرابط غير صالح أو منتهي الصلاحية", "The link is invalid or expired"),
