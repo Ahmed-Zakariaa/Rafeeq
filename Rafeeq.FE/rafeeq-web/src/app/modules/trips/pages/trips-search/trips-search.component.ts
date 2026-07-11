@@ -22,7 +22,8 @@ import {
   TripSearchFilter,
   TripSortField,
 } from '../../models/trip.models';
-import { CITIES, cityName } from '../../../../core/lookups';
+import { CityLookup, cityName } from '../../../../core/lookups';
+import { LookupsService } from '../../../../services/lookups.service';
 import { LanguageService } from '../../../../services/language.service';
 
 @Component({
@@ -45,6 +46,7 @@ import { LanguageService } from '../../../../services/language.service';
   templateUrl: './trips-search.component.html',
 })
 export class TripsSearchComponent implements OnInit {
+  allCities: CityLookup[] = [];
   cityOptions: { label: string; value: number }[] = [];
   genderOptions: { label: string; value: number }[] = [];
   sortOptions: { label: string; value: TripSortField }[] = [];
@@ -78,6 +80,7 @@ export class TripsSearchComponent implements OnInit {
     private tripsApi: TripsService,
     private bookings: BookingsService,
     private auth: AuthService,
+    private lookups: LookupsService,
     private toast: MessageService,
     private t: TranslateService,
     public lang: LanguageService
@@ -114,12 +117,16 @@ export class TripsSearchComponent implements OnInit {
   ngOnInit(): void {
     this.buildOptions();
     this.t.onLangChange.subscribe(() => this.buildOptions());
+    this.lookups.cities().subscribe((c) => {
+      this.allCities = c;
+      this.buildOptions();
+    });
     this.search();
   }
 
   private buildOptions(): void {
     const l = this.lang.current();
-    this.cityOptions = CITIES.map((c) => ({ label: cityName(c, l), value: c.id }));
+    this.cityOptions = this.allCities.map((c) => ({ label: cityName(c, l), value: c.Id }));
     this.genderOptions = [
       { label: this.t.instant('trips.gender.Any'), value: GenderPreference.Any },
       { label: this.t.instant('trips.gender.MaleOnly'), value: GenderPreference.MaleOnly },

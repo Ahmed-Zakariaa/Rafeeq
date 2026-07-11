@@ -17,7 +17,8 @@ import { TripsService } from '../../trips.service';
 import { VehiclesService } from '../../../vehicles/vehicles.service';
 import { VehicleResult } from '../../../vehicles/models/vehicle.models';
 import { GenderPreference, MAX_PRICE_PER_SEAT, TripCreateRequest } from '../../models/trip.models';
-import { CITIES, cityName } from '../../../../core/lookups';
+import { CityLookup, cityName } from '../../../../core/lookups';
+import { LookupsService } from '../../../../services/lookups.service';
 import { LanguageService } from '../../../../services/language.service';
 
 @Component({
@@ -44,6 +45,7 @@ export class TripsCreateComponent implements OnInit {
 
   vehicles: VehicleResult[] = [];
   vehicleOptions: { label: string; value: number; seats: number }[] = [];
+  allCities: CityLookup[] = [];
   cityOptions: { label: string; value: number }[] = [];
   genderOptions: { label: string; value: number }[] = [];
 
@@ -67,6 +69,7 @@ export class TripsCreateComponent implements OnInit {
     private fb: FormBuilder,
     private tripsApi: TripsService,
     private vehiclesApi: VehiclesService,
+    private lookups: LookupsService,
     private router: Router,
     private toast: MessageService,
     private t: TranslateService,
@@ -78,6 +81,10 @@ export class TripsCreateComponent implements OnInit {
     this.t.onLangChange.subscribe(() => this.buildOptions());
     this.applyPriceValidators(this.form.controls.isFree.value);
     this.form.controls.isFree.valueChanges.subscribe((free) => this.applyPriceValidators(free));
+    this.lookups.cities().subscribe((c) => {
+      this.allCities = c;
+      this.buildOptions();
+    });
     this.loadVehicles();
   }
 
@@ -103,7 +110,7 @@ export class TripsCreateComponent implements OnInit {
 
   private buildOptions(): void {
     const l = this.lang.current();
-    this.cityOptions = CITIES.map((c) => ({ label: cityName(c, l), value: c.id }));
+    this.cityOptions = this.allCities.map((c) => ({ label: cityName(c, l), value: c.Id }));
     this.genderOptions = [
       { label: this.t.instant('trips.gender.Any'), value: GenderPreference.Any },
       { label: this.t.instant('trips.gender.MaleOnly'), value: GenderPreference.MaleOnly },

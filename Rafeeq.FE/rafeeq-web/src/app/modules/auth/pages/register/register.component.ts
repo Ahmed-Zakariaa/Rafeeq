@@ -13,7 +13,10 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { MessageService } from 'primeng/api';
 
 import { AuthService } from '../../../../services/auth.service';
-import { COUNTRIES, Gender, RegisterRequest } from '../../models/auth.models';
+import { LookupsService } from '../../../../services/lookups.service';
+import { LanguageService } from '../../../../services/language.service';
+import { CountryLookup, countryName } from '../../../../core/lookups';
+import { Gender, RegisterRequest } from '../../models/auth.models';
 
 @Component({
   selector: 'app-register',
@@ -34,6 +37,7 @@ import { COUNTRIES, Gender, RegisterRequest } from '../../models/auth.models';
 })
 export class RegisterComponent implements OnInit {
   loading = false;
+  countries: CountryLookup[] = [];
   countryOptions: { label: string; value: number }[] = [];
   genderOptions: { label: string; value: Gender }[] = [];
 
@@ -43,7 +47,7 @@ export class RegisterComponent implements OnInit {
     phoneNumber: ['', [Validators.required]],
     password: ['', [Validators.required, Validators.minLength(6)]],
     gender: [Gender.Male, [Validators.required]],
-    countryId: [COUNTRIES[0].id, [Validators.required]],
+    countryId: [null as number | null, [Validators.required]],
     asDriver: [false],
   });
 
@@ -51,23 +55,33 @@ export class RegisterComponent implements OnInit {
     private fb: FormBuilder,
     private auth: AuthService,
     private router: Router,
+    private lookups: LookupsService,
     private toast: MessageService,
-    private t: TranslateService
+    private t: TranslateService,
+    public lang: LanguageService
   ) {}
 
   ngOnInit(): void {
     this.buildOptions();
     this.t.onLangChange.subscribe(() => this.buildOptions());
+    this.lookups.countries().subscribe((cs) => {
+      this.countries = cs;
+      if (cs.length && !this.form.controls.countryId.value) {
+        this.form.controls.countryId.setValue(cs[0].Id);
+      }
+      this.buildOptions();
+    });
   }
 
   get phonePrefix(): string {
-    return COUNTRIES.find((c) => c.id === this.form.controls.countryId.value)?.phonePrefix ?? '';
+    return this.countries.find((c) => c.Id === this.form.controls.countryId.value)?.PhonePrefix ?? '';
   }
 
   private buildOptions(): void {
-    this.countryOptions = COUNTRIES.map((c) => ({
-      label: this.t.instant(c.nameKey),
-      value: c.id,
+    const l = this.lang.current();
+    this.countryOptions = this.countries.map((c) => ({
+      label: countryName(c, l),
+      value: c.Id,
     }));
     this.genderOptions = [
       { label: this.t.instant('fields.male'), value: Gender.Male },

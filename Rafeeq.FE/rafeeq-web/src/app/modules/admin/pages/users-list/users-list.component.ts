@@ -20,7 +20,10 @@ import { AdminService } from '../../admin.service';
 import { AdminRolesService } from '../../admin-roles.service';
 import { AccountStatus, CreateAdminRequest, UserListItem } from '../../models/admin.models';
 import { AuthService } from '../../../../services/auth.service';
-import { COUNTRIES, Gender } from '../../../auth/models/auth.models';
+import { Gender } from '../../../auth/models/auth.models';
+import { LookupsService } from '../../../../services/lookups.service';
+import { LanguageService } from '../../../../services/language.service';
+import { CountryLookup, countryName } from '../../../../core/lookups';
 
 @Component({
   selector: 'app-users-list',
@@ -63,6 +66,7 @@ export class UsersListComponent implements OnInit {
   canManageAdmins = this.auth.hasPermission('Admins.Manage');
 
   catalog: string[] = [];
+  countries: CountryLookup[] = [];
   countryOptions: { label: string; value: number }[] = [];
   genderOptions: { label: string; value: number }[] = [];
 
@@ -75,7 +79,7 @@ export class UsersListComponent implements OnInit {
     email: ['', [Validators.required, Validators.email]],
     phoneNumber: ['', [Validators.required]],
     gender: [Gender.Male],
-    countryId: [COUNTRIES[0].id],
+    countryId: [null as number | null, [Validators.required]],
   });
 
   // Permissions dialog
@@ -91,9 +95,11 @@ export class UsersListComponent implements OnInit {
     private admin: AdminService,
     private rolesApi: AdminRolesService,
     private auth: AuthService,
+    private lookups: LookupsService,
     private route: ActivatedRoute,
     private toast: MessageService,
-    private t: TranslateService
+    private t: TranslateService,
+    public lang: LanguageService
   ) {}
 
   ngOnInit(): void {
@@ -104,6 +110,10 @@ export class UsersListComponent implements OnInit {
 
     this.buildOptions();
     this.t.onLangChange.subscribe(() => this.buildOptions());
+    this.lookups.countries().subscribe((cs) => {
+      this.countries = cs;
+      this.buildOptions();
+    });
 
     if (this.canManageAdmins) {
       this.loadCatalog();
@@ -126,7 +136,7 @@ export class UsersListComponent implements OnInit {
       { label: this.t.instant('admin.status.Suspended'), value: AccountStatus.Suspended },
       { label: this.t.instant('admin.status.Banned'), value: AccountStatus.Banned },
     ];
-    this.countryOptions = COUNTRIES.map((c) => ({ label: this.t.instant(c.nameKey), value: c.id }));
+    this.countryOptions = this.countries.map((c) => ({ label: countryName(c, this.lang.current()), value: c.Id }));
     this.genderOptions = [
       { label: this.t.instant('fields.male'), value: Gender.Male },
       { label: this.t.instant('fields.female'), value: Gender.Female },
@@ -187,7 +197,7 @@ export class UsersListComponent implements OnInit {
 
   // ── Create admin ──────────────────────────────────────────────
   openCreate(): void {
-    this.createForm.reset({ gender: Gender.Male, countryId: COUNTRIES[0].id });
+    this.createForm.reset({ gender: Gender.Male, countryId: this.countries[0]?.Id ?? null });
     this.newAdminPerms = [];
     this.createVisible = true;
   }
@@ -198,7 +208,8 @@ export class UsersListComponent implements OnInit {
       return;
     }
     this.saving = true;
-    const req: CreateAdminRequest = { ...this.createForm.getRawValue(), permissions: this.newAdminPerms };
+    const raw = this.createForm.getRawValue();
+    const req: CreateAdminRequest = { ...raw, countryId: raw.countryId!, permissions: this.newAdminPerms };
     this.admin.createAdmin(req).subscribe({
       next: (res) => {
         this.saving = false;
