@@ -11,8 +11,11 @@ public class RafeeqDbContextFactory : IDesignTimeDbContextFactory<RafeeqDbContex
 {
     public RafeeqDbContext CreateDbContext(string[] args)
     {
+        // Only the provider matters for generating migrations; set RAFEEQ_DB to run them (e.g. against Neon).
+        var conn = Environment.GetEnvironmentVariable("RAFEEQ_DB")
+            ?? "Host=localhost;Database=rafeeq;Username=postgres;Password=postgres";
         var options = new DbContextOptionsBuilder<RafeeqDbContext>()
-            .UseSqlServer("Server=.;Database=RafeeqDb;Trusted_Connection=True;TrustServerCertificate=True;")
+            .UseNpgsql(conn)
             .Options;
         return new RafeeqDbContext(options);
     }

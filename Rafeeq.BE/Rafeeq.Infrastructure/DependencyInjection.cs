@@ -16,7 +16,7 @@ public static class DependencyInjection
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration config)
     {
         services.AddDbContext<RafeeqDbContext>(opt =>
-            opt.UseSqlServer(config.GetConnectionString("Default")));
+            opt.UseNpgsql(config.GetConnectionString("Default")));
 
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUser, CurrentUser>();

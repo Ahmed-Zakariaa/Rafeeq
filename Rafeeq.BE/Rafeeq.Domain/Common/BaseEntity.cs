@@ -35,7 +35,7 @@ public abstract class BaseEntity<TId> : IAuditableEntity, ICanBeSoftDeleted
     public bool IsActive { get; protected set; } = true;
     public bool IsDeleted { get; protected set; }
 
-    [Timestamp]
+    // Concurrency token. SQL Server used rowversion; on PostgreSQL this is a plain (unused) column.
     public byte[]? RowVersion { get; set; }
 
     public virtual void Delete() => IsDeleted = true;

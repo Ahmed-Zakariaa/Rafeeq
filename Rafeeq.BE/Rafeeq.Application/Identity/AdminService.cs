@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Rafeeq.Domain.Common;
 using Rafeeq.Domain.Identity;
 using Rafeeq.Domain.Identity.DTOs;
@@ -10,15 +11,15 @@ namespace Rafeeq.Application.Identity;
 
 public class AdminService : IAdminService
 {
-    private const string FrontendBaseUrl = "http://localhost:4200";
-
     private readonly RafeeqDbContext _db;
     private readonly IEmailSender _email;
+    private readonly string _frontendBaseUrl;
 
-    public AdminService(RafeeqDbContext db, IEmailSender email)
+    public AdminService(RafeeqDbContext db, IEmailSender email, IConfiguration config)
     {
         _db = db;
         _email = email;
+        _frontendBaseUrl = config["App:FrontendBaseUrl"] ?? "http://localhost:4200";
     }
 
     public async Task<ResultViewModel<List<UserListItemDto>>> ListUsers(
@@ -86,7 +87,7 @@ public class AdminService : IAdminService
         user.SetPasswordResetToken(token, DateTime.UtcNow.AddHours(48));
         await _db.SaveChangesAsync();
 
-        var link = $"{FrontendBaseUrl}/auth/set-password?token={token}";
+        var link = $"{_frontendBaseUrl}/auth/set-password?token={token}";
         await _email.SendAsync(user.Email, "Your Rafeeq admin account",
             $"An admin account was created for you. Set your password to activate: {link}");
 

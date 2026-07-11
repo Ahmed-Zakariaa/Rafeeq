@@ -12,6 +12,10 @@ using Rafeeq.Infrastructure.Middleware;
 using Rafeeq.Infrastructure.Persistence;
 using Rafeeq.Infrastructure.Security;
 
+// PostgreSQL: treat DateTime as timestamp-without-tz (like SQL Server datetime2), so existing
+// UtcNow/Unspecified values write without Kind errors.
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Layers
@@ -47,8 +51,10 @@ builder.Services.AddSwaggerGen(c =>
 
 // CORS for the Angular dev origin
 const string CorsPolicy = "RafeeqFE";
+var corsOrigins = builder.Configuration.GetSection("Cors:Origins").Get<string[]>()
+    ?? new[] { "http://localhost:4200" };
 builder.Services.AddCors(o => o.AddPolicy(CorsPolicy, p =>
-    p.WithOrigins("http://localhost:4200").AllowAnyHeader().AllowAnyMethod()));
+    p.WithOrigins(corsOrigins).AllowAnyHeader().AllowAnyMethod()));
 
 // JWT auth
 var jwt = builder.Configuration.GetSection("Jwt").Get<JwtSettings>() ?? new JwtSettings();

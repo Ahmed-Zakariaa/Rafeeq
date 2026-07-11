@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Rafeeq.Domain.Common;
 using Rafeeq.Domain.Identity;
 using Rafeeq.Domain.Identity.DTOs;
@@ -9,23 +10,23 @@ namespace Rafeeq.Application.Identity;
 
 public class AuthService : IAuthService
 {
-    // Where the FE serves the set-password / reset pages (dev). Move to config before deploy.
-    private const string FrontendBaseUrl = "http://localhost:4200";
-
     private readonly RafeeqDbContext _db;
     private readonly IPasswordHasher _hasher;
     private readonly IJwtTokenService _jwt;
     private readonly IEmailSender _email;
     private readonly ICurrentUser _currentUser;
+    // Where the FE serves the reset / set-password pages. From config (App:FrontendBaseUrl).
+    private readonly string _frontendBaseUrl;
 
     public AuthService(RafeeqDbContext db, IPasswordHasher hasher, IJwtTokenService jwt,
-        IEmailSender email, ICurrentUser currentUser)
+        IEmailSender email, ICurrentUser currentUser, IConfiguration config)
     {
         _db = db;
         _hasher = hasher;
         _jwt = jwt;
         _email = email;
         _currentUser = currentUser;
+        _frontendBaseUrl = config["App:FrontendBaseUrl"] ?? "http://localhost:4200";
     }
 
     public async Task<ResultViewModel<AuthResultDto>> Register(RegisterDto dto)
@@ -115,7 +116,7 @@ public class AuthService : IAuthService
             user.SetPasswordResetToken(token, DateTime.UtcNow.AddHours(2));
             await _db.SaveChangesAsync();
 
-            var link = $"{FrontendBaseUrl}/auth/reset-password?token={token}";
+            var link = $"{_frontendBaseUrl}/auth/reset-password?token={token}";
             await _email.SendAsync(user.Email, "Reset your Rafeeq password",
                 $"Use this link to reset your password: {link}");
         }
