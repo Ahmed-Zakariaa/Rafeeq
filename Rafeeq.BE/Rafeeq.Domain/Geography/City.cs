@@ -17,4 +17,10 @@ public class City : BaseEntity<int>
         NameAr = nameAr;
         NameEn = nameEn;
     }
+
+    public void Update(string nameAr, string nameEn)
+    {
+        NameAr = nameAr;
+        NameEn = nameEn;
+    }
 }

@@ -25,19 +25,14 @@ public static class DbSeeder
 
         if (!await db.Countries.AnyAsync())
         {
-            var egypt = new Country("مصر", "Egypt", "EG", "EGP", "+20");
-            var ksa = new Country("السعودية", "Saudi Arabia", "SA", "SAR", "+966");
-            db.Countries.AddRange(egypt, ksa);
-            await db.SaveChangesAsync();
-
-            db.Cities.AddRange(
-                new City(egypt.Id, "القاهرة", "Cairo"),
-                new City(egypt.Id, "الإسكندرية", "Alexandria"),
-                new City(ksa.Id, "الرياض", "Riyadh"),
-                new City(ksa.Id, "جدة", "Jeddah"),
-                new City(ksa.Id, "الدمام", "Dammam"));
+            db.Countries.AddRange(
+                new Country("مصر", "Egypt", "EG", "EGP", "+20"),
+                new Country("السعودية", "Saudi Arabia", "SA", "SAR", "+966"));
             await db.SaveChangesAsync();
         }
+
+        // Idempotent — adds any missing cities, so existing DBs pick up new ones on restart.
+        await EnsureCities(db);
 
         if (!await db.Users.AnyAsync(u => u.Email == SuperAdminEmail))
         {
@@ -53,6 +48,44 @@ public static class DbSeeder
             await db.SaveChangesAsync();
 
             Console.WriteLine($"[Seed] Super admin ready: {SuperAdminEmail} / {SuperAdminTempPassword} (change after first login)");
+        }
+    }
+
+    private static async Task EnsureCities(RafeeqDbContext db)
+    {
+        var egyptId = await db.Countries.Where(c => c.IsoCode == "EG").Select(c => c.Id).FirstOrDefaultAsync();
+        var ksaId = await db.Countries.Where(c => c.IsoCode == "SA").Select(c => c.Id).FirstOrDefaultAsync();
+        if (egyptId == 0 || ksaId == 0) return;
+
+        var desired = new List<(int CountryId, string Ar, string En)>
+        {
+            // Egypt
+            (egyptId, "القاهرة", "Cairo"), (egyptId, "الإسكندرية", "Alexandria"), (egyptId, "الجيزة", "Giza"),
+            (egyptId, "بورسعيد", "Port Said"), (egyptId, "السويس", "Suez"), (egyptId, "الأقصر", "Luxor"),
+            (egyptId, "أسوان", "Aswan"), (egyptId, "المنصورة", "Mansoura"), (egyptId, "طنطا", "Tanta"),
+            (egyptId, "أسيوط", "Asyut"), (egyptId, "الإسماعيلية", "Ismailia"), (egyptId, "الزقازيق", "Zagazig"),
+            (egyptId, "الغردقة", "Hurghada"), (egyptId, "شرم الشيخ", "Sharm El Sheikh"), (egyptId, "6 أكتوبر", "6th of October"),
+            // Saudi Arabia
+            (ksaId, "الرياض", "Riyadh"), (ksaId, "جدة", "Jeddah"), (ksaId, "مكة المكرمة", "Mecca"),
+            (ksaId, "المدينة المنورة", "Medina"), (ksaId, "الدمام", "Dammam"), (ksaId, "الخبر", "Khobar"),
+            (ksaId, "الظهران", "Dhahran"), (ksaId, "الطائف", "Taif"), (ksaId, "تبوك", "Tabuk"),
+            (ksaId, "بريدة", "Buraidah"), (ksaId, "خميس مشيط", "Khamis Mushait"), (ksaId, "أبها", "Abha"),
+            (ksaId, "حائل", "Hail"), (ksaId, "الجبيل", "Jubail"), (ksaId, "ينبع", "Yanbu"),
+        };
+
+        var existing = (await db.Cities.Select(c => new { c.CountryId, c.NameEn }).ToListAsync())
+            .Select(x => (x.CountryId, x.NameEn)).ToHashSet();
+
+        var toAdd = desired
+            .Where(d => !existing.Contains((d.CountryId, d.En)))
+            .Select(d => new City(d.CountryId, d.Ar, d.En))
+            .ToList();
+
+        if (toAdd.Count > 0)
+        {
+            db.Cities.AddRange(toAdd);
+            await db.SaveChangesAsync();
+            Console.WriteLine($"[Seed] Added {toAdd.Count} cities (total catalog now ~{existing.Count + toAdd.Count}).");
         }
     }
 }

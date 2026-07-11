@@ -2,6 +2,7 @@ using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using Rafeeq.Application.Bookings;
 using Rafeeq.Application.Identity;
+using Rafeeq.Application.Lookups;
 using Rafeeq.Application.Notifications;
 using Rafeeq.Application.Ratings;
 using Rafeeq.Application.Reports;
@@ -9,6 +10,7 @@ using Rafeeq.Application.Trips;
 using Rafeeq.Application.Vehicles;
 using Rafeeq.Application.Verification;
 using Rafeeq.Domain.Bookings.IService;
+using Rafeeq.Domain.Geography.IService;
 using Rafeeq.Domain.Identity.IService;
 using Rafeeq.Domain.Notifications.IService;
 using Rafeeq.Domain.Ratings.IService;
@@ -33,6 +35,7 @@ public static class DependencyInjection
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IAdminService, AdminService>();
         services.AddScoped<IAdminRoleService, AdminRoleService>();
+        services.AddScoped<ILookupService, LookupService>();
 
         services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
 

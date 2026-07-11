@@ -18,6 +18,8 @@ public static class Localizer
         ["emailNotVerified"] = ("يجب توثيق بريدك الإلكتروني أولاً", "Please verify your email first"),
         ["emailAlreadyRegistered"] = ("البريد الإلكتروني مسجّل بالفعل", "Email is already registered"),
         ["countryNotFound"] = ("الدولة غير موجودة", "Country not found"),
+        ["cityNotFound"] = ("المدينة غير موجودة", "City not found"),
+        ["isoCodeAlreadyExists"] = ("رمز الدولة مستخدم بالفعل", "Country code already exists"),
         ["invalidOrExpiredToken"] = ("الرابط غير صالح أو منتهي الصلاحية", "The link is invalid or expired"),
         ["invalidOrExpiredOtp"] = ("الرمز غير صحيح أو منتهي الصلاحية", "The code is incorrect or expired"),
         ["notAuthenticated"] = ("يجب تسجيل الدخول أولاً", "You must be logged in"),

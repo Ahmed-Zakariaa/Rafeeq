@@ -22,4 +22,13 @@ public class Country : BaseEntity<int>
         CurrencyCode = currencyCode;
         PhonePrefix = phonePrefix;
     }
+
+    public void Update(string nameAr, string nameEn, string isoCode, string currencyCode, string phonePrefix)
+    {
+        NameAr = nameAr;
+        NameEn = nameEn;
+        IsoCode = isoCode;
+        CurrencyCode = currencyCode;
+        PhonePrefix = phonePrefix;
+    }
 }
