@@ -1,0 +1,8 @@
+**/bin/
+**/obj/
+Rafeeq.FE/
+docs/
+.git/
+.github/
+_fe_staged_tmp/
+**/uploads/
